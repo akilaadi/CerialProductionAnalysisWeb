@@ -10,11 +10,11 @@ using System.Web.UI.DataVisualization.Charting;
 
 public partial class _Default : Page
 {
-    public Dictionary<string, float> job1Result;
-    public Dictionary<string, float> job2Result;
+    public Dictionary<string, float> job1Result, job2Result, job3Result;
 
     string url1 = "http://ec2-13-228-183-9.ap-southeast-1.compute.amazonaws.com:50075/webhdfs/v1/user/hduser/output/job1/part-r-00000?op=OPEN&namenoderpcaddress=master:54310&offset=0";
     string url2 = "http://ec2-13-228-183-9.ap-southeast-1.compute.amazonaws.com:50075/webhdfs/v1/user/hduser/output/job2/part-r-00000?op=OPEN&namenoderpcaddress=master:54310&offset=0";
+    string url3 = "http://ec2-13-228-183-9.ap-southeast-1.compute.amazonaws.com:50075/webhdfs/v1/user/hduser/output/job3/part-r-00000?op=OPEN&namenoderpcaddress=master:54310&offset=0";
 
 
     protected void Page_Load(object sender, EventArgs e)
@@ -23,6 +23,7 @@ public partial class _Default : Page
         {
             job1Result = ReadJobResult(url1);
             job2Result = ReadJobResult(url2);
+            job3Result = ReadJobResult(url3);
 
             if (!this.IsPostBack)
             {
@@ -36,6 +37,14 @@ public partial class _Default : Page
                 Chart1.Series["Series1"].XValueMember = "Key";
                 Chart1.Series["Series1"].YValueMembers = "Value";
                 Chart1.DataBind();
+            }
+
+            if (job3Result.Count > 0)
+            {
+                Chart3.DataSource = job1Result;
+                Chart3.Series["Series1"].XValueMember = "Key";
+                Chart3.Series["Series1"].YValueMembers = "Value";
+                Chart3.DataBind();
             }
         }
         catch (Exception ex)
@@ -85,7 +94,7 @@ public partial class _Default : Page
         {
             Dictionary<string, float> selected = new Dictionary<string, float>();
             job2Result.Where(t => t.Key.Split('-')[0].Equals(DropDownList1.SelectedValue))
-                .OrderBy(t=>t.Value)
+                .OrderBy(t => t.Value)
                 .ToList()
                 .ForEach(t =>
                 {
